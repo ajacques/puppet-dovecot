@@ -1,0 +1,7 @@
+ssl = yes
+ssl_cert = <<%= @ssl_certificate_path %>
+ssl_key = <<%= @ssl_certificate_path %>
+
+<% if defined? @ssl_protocol_list %>ssl_protocols = <%= @ssl_protocol_list %><% end %>
+<% if defined? @ssl_cipher_list %>ssl_cipher_list = <%= @ssl_cipher_list %>
+ssl_prefer_server_ciphers = yes<% end %>

@@ -1,5 +1,7 @@
 class dovecot::config (
-	$ssl_certificate = undef
+	$ssl_certificate = undef,
+	$ssl_cipher_list = undef,
+	$ssl_protocol_list = undef
 ) {
 	$config_root = '/etc/dovecot'
 	$pid_path = '/var/run/dovecot/'
@@ -9,17 +11,22 @@ class dovecot::config (
 	}
 
 	file {$config_root:
-		owner => 'dovecot',
-		group => 'dovecot',
-		mode => '440'
+		owner => 'root',
+		group => 'root',
+		mode => '0755'
 	}
 
 	if $ssl_certificate != undef {
-		file {"${config_root}/ssl_certificate.pem":
+		$ssl_certificate_path = "${config_root}/ssl_certificate.pem"
+		file {$ssl_certificate_path:
 			owner => 'root',
 			group => 'root',
 			mode => '400',
-			content => $ssl_certificate
+			source => $ssl_certificate
+		}
+
+		file {"${config_root}/conf.d/10-ssl.conf":
+			content => template('dovecot/ssl.conf.erb')
 		}
 	}
 

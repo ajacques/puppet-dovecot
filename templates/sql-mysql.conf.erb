@@ -1,0 +1,30 @@
+driver = mysql
+connect = <%= @connect_string %>
+default_pass_scheme = PLAIN
+
+password_query = \
+   SELECT username AS user, password \
+   FROM user_accounts \
+   WHERE username IN ('%u', '%n')
+
+user_query = \
+  SELECT uid, gid, home, mail \
+   FROM user_accounts \
+   WHERE username IN ('%u', '%n') \
+   UNION \
+   SELECT T.* \
+   FROM ( \
+    SELECT uid, gid, home, mail \
+     FROM email_aliases AS alias \
+     INNER JOIN user_accounts AS user ON alias.target_uid = user.id \
+     WHERE alias.email_address = '%u' \
+    UNION \
+    SELECT uid, gid, home, mail \
+     FROM email_aliases AS alias \
+     INNER JOIN user_accounts AS user ON alias.target_uid = user.id \
+     WHERE alias.email_address = '@%d') AS T \
+   LIMIT 0,1
+
+iterate_query = \
+  SELECT username AS user \
+  FROM user_accounts
